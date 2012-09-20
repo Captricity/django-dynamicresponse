@@ -42,13 +42,14 @@ class Emitter(object):
         'exclude'
     ])
 
-    def __init__(self, payload, typemapper, handler, fields=(), anonymous=True):
+    def __init__(self, payload, typemapper, handler, fields=(), anonymous=True, version=None):
 
         self.typemapper = typemapper
         self.data = payload
         self.handler = handler
         self.fields = fields
         self.anonymous = anonymous
+        self.version = version
 
         if isinstance(self.data, Exception):
             raise
@@ -139,12 +140,14 @@ class Emitter(object):
             ret = { }
             handler = None
 
-            # Does the model implement get_serialization_fields() or serialize_fields()?
+            # Does the model implement get_serialization_fields() or serialize_fields() or versioned_serialize_fields()?
             # We should only serialize these fields.
             if hasattr(data, 'get_serialization_fields'):
                 fields = set(data.get_serialization_fields())
             if hasattr(data, 'serialize_fields'):
                 fields = set(data.serialize_fields())
+            if hasattr(data, 'versioned_serialize_fields'):
+                fields = set(data.versioned_serialize_fields(self.version))
 
             # Is the model a Django user instance?
             # Ensure that only core (non-sensitive fields) are serialized
