@@ -20,6 +20,10 @@ from django.core.paginator import Page
 import decimal, re, inspect
 import copy
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 class Emitter(object):
     """
     Super emitter. All other emitters should subclass
@@ -99,10 +103,18 @@ class Emitter(object):
             elif inspect.isfunction(thing):
                 if not inspect.getargspec(thing)[0]:
                     ret = _any(thing())
+            elif hasattr(thing, '__versioned_emittable__'):
+                f = thing.__versioned_emittable__
+                if inspect.ismethod(f) and len(inspect.getargspec(f)[0]) == 2:
+                    ret = _any(f(self.version))
+                else:
+                    logger.warn('__versioned_emittable__ is not a method with the right number of arguments (2). Ignoring...')
             elif hasattr(thing, '__emittable__'):
                 f = thing.__emittable__
                 if inspect.ismethod(f) and len(inspect.getargspec(f)[0]) == 1:
                     ret = _any(f())
+                else:
+                    logger.warn('__emittable__ is not a method with the right number of arguments (2). Ignoring...')
             elif repr(thing).startswith("<django.db.models.fields.related.RelatedManager"):
                 ret = _any(thing.all())
             else:

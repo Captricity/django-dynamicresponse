@@ -37,6 +37,35 @@ class ModelWithVersionedSerializeFields(models.Model):
             'title'
         ]
 
+class EmittableResource(object):
+    def __init__(self, id, title):
+        self.id = id
+        self.title = title
+        self.text = 'always happy'
+
+    def __emittable__(self):
+        return dict([(k, getattr(self, k)) for k in ('id', 'title')])
+
+class EmittableResource(object):
+    def __init__(self, id, title):
+        self.id = id
+        self.title = title
+        self.text = 'always happy'
+
+    def __emittable__(self):
+        return dict([(k, getattr(self, k)) for k in ('id', 'title')])
+
+class VersionedEmittableResource(object):
+    def __init__(self, id, title):
+        self.id = id
+        self.title = title
+        self.text = 'always happy'
+
+    def __versioned_emittable__(self, version):
+        if version == 'v1':
+            return dict([(k, getattr(self, k)) for k in ('id', 'title')])
+        return dict([(k, getattr(self, k)) for k in ('id', 'title', 'text')])
+
 
 
 class JsonResponseTest(unittest.TestCase):
@@ -63,6 +92,42 @@ class JsonResponseTest(unittest.TestCase):
                                                                             text='is said repeatedly in Street Fighter',
                                                                             _password='is secret'))
 
+    def testEmittableResource(self):
+        emittableResource = EmittableResource(1, 'test')
+        resp = JsonResponse(emittableResource)
+        result = simplejson.loads(resp.content)
+        for key, value in result.items():
+            self.assertEqual(getattr(emittableResource, key).__str__(), value.__str__())
+        self.assert_('id' in result.keys())
+        self.assert_('title' in result.keys())
+        self.assert_('text' not in result.keys())
+
+        # test that version is ignored
+        resp = JsonResponse(emittableResource, version='v1')
+        result = simplejson.loads(resp.content)
+        for key, value in result.items():
+            self.assertEqual(getattr(emittableResource, key).__str__(), value.__str__())
+        self.assert_('id' in result.keys())
+        self.assert_('title' in result.keys())
+        self.assert_('text' not in result.keys())
+
+    def testVersionedEmittableResource(self):
+        versionedEmittableResource = VersionedEmittableResource(1, 'test')
+        resp = JsonResponse(versionedEmittableResource)
+        result = simplejson.loads(resp.content)
+        for key, value in result.items():
+            self.assertEqual(getattr(versionedEmittableResource, key).__str__(), value.__str__())
+        self.assert_('id' in result.keys())
+        self.assert_('title' in result.keys())
+        self.assert_('text' in result.keys())
+
+        resp = JsonResponse(versionedEmittableResource, version='v1')
+        result = simplejson.loads(resp.content)
+        for key, value in result.items():
+            self.assertEqual(getattr(versionedEmittableResource, key).__str__(), value.__str__())
+        self.assert_('id' in result.keys())
+        self.assert_('title' in result.keys())
+        self.assert_('text' not in result.keys())
 
     def testIsInstanceOfHttpResponse(self):
         self.assertTrue(isinstance(self.jsonres, HttpResponse), 'should be an instance of HttpResponse')
