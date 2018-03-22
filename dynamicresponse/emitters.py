@@ -10,7 +10,7 @@ from django.utils import simplejson
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import smart_unicode
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.core.serializers.json import DateTimeAwareJSONEncoder
+from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -287,5 +287,5 @@ class JSONEmitter(Emitter):
         if settings.DEBUG:
             indent = 4
 
-        seria = simplejson.dumps(self.construct(), cls=DateTimeAwareJSONEncoder, ensure_ascii=False, indent=indent)
+        seria = simplejson.dumps(self.construct(), cls=DjangoJSONEncoder, ensure_ascii=False, indent=indent)
         return seria
