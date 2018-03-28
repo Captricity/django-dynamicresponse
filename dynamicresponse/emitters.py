@@ -2,23 +2,22 @@
 This file is based on source code from django-piston, available at the following URL:
 http://bitbucket.org/jespern/django-piston
 """
-
 from __future__ import generators
+
+import json
 from django.db.models.query import QuerySet
-from django.db.models import Model, permalink
-from django.utils import simplejson
-from django.utils.xmlutils import SimplerXMLGenerator
+from django.db.models import Model
 from django.utils.encoding import smart_unicode
-from django.core.urlresolvers import reverse, NoReverseMatch
-from django.core.serializers.json import DateTimeAwareJSONEncoder
+from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.http import HttpResponse
-from django.core import serializers
 from django.core.paginator import Page
 
-import decimal, re, inspect
-import copy
+import decimal, inspect
+
+import logging
+logger = logging.getLogger(__name__)
+
 
 import logging
 logger = logging.getLogger(__name__)
@@ -217,7 +216,8 @@ class Emitter(object):
                     else:
                         maybe = getattr(data, maybe_field, None)
                         if maybe:
-                            if callable(maybe):
+                            if (callable(maybe) and
+                                    maybe.__class__.__name__ not in ('RelatedManager', 'ManyRelatedManager', 'GenericRelatedObjectManager')):
                                 if len(inspect.getargspec(maybe)[0]) == 1:
                                     ret[maybe_field] = _any(maybe())
                             else:
@@ -287,5 +287,5 @@ class JSONEmitter(Emitter):
         if settings.DEBUG:
             indent = 4
 
-        seria = simplejson.dumps(self.construct(), cls=DateTimeAwareJSONEncoder, ensure_ascii=False, indent=indent)
+        seria = json.dumps(self.construct(), cls=DjangoJSONEncoder, ensure_ascii=False, indent=indent)
         return seria
