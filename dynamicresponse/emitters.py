@@ -114,7 +114,7 @@ class Emitter(object):
                     ret = _any(f())
                 else:
                     logger.warn('__emittable__ is not a method with the right number of arguments (2). Ignoring...')
-            elif repr(thing).startswith("<django.db.models.fields.related.RelatedManager"):
+            elif repr(thing).startswith("<django.db.models.fields.related_descriptors.RelatedManager"):
                 ret = _any(thing.all())
             else:
                 ret = smart_unicode(thing, strings_only=True)
