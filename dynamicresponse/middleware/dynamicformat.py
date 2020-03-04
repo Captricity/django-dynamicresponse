@@ -1,9 +1,9 @@
 import json
 from django.http import HttpResponse, QueryDict
-
+from django.utils.deprecation import MiddlewareMixin
 from dynamicresponse.response import DynamicResponse
 
-class DynamicFormatMiddleware:
+class DynamicFormatMiddleware(MiddlewareMixin):
     """
     Provides support for dynamic content negotiation, both in request and reponse.
     """
