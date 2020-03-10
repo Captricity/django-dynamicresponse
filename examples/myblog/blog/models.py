@@ -1,3 +1,4 @@
+import six
 from django.db import models
 
 class BlogPost(models.Model):
@@ -12,6 +13,12 @@ class BlogPost(models.Model):
 
     def __unicode__(self):        
         return self.title
+
+    def __str__(self):
+        if six.PY2:
+            return unicode(self).encode('utf-8')
+        return self.__unicode__()
+
         
     def serialize_fields(self):
         """Only these fields will be included in API responses."""

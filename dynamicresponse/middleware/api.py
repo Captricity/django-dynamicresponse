@@ -1,8 +1,11 @@
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.http import HttpResponse, HttpResponseRedirect
+from django.utils.deprecation import MiddlewareMixin
 
-class APIMiddleware:
+class APIMiddleware(MiddlewareMixin):
     """
     Detects API requests and provides support for Basic authentication.
     """
