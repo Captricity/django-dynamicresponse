@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.forms import Form, ModelForm
 from django.http import HttpResponse, HttpResponseRedirect

@@ -17,6 +17,7 @@ setup(
     name='django-dynamicresponse',
     version=__version__,
     description='Lightweight framework for easily providing REST APIs for web apps built with Django.',
+    install_requires=['six'],
     long_description=open('README.md').read(),
     author='Funkbit',
     author_email='post@funkbit.no',

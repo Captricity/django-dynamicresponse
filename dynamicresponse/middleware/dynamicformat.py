@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import json
 from django.http import HttpResponse, QueryDict
 from django.utils.deprecation import MiddlewareMixin
@@ -73,7 +75,7 @@ class DynamicFormatMiddleware(MiddlewareMixin):
                     decoded_dict = json.loads(request.body)
                     request.POST = request.POST.copy()
                     request.POST = self._flatten_dict(decoded_dict)
-                except:
+                except Exception:
                     return HttpResponse('Invalid JSON', status=400)
 
     def process_response(self, request, response):

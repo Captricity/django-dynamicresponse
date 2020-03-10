@@ -3,11 +3,13 @@ This file is based on source code from django-piston, available at the following
 http://bitbucket.org/jespern/django-piston
 """
 from __future__ import generators
+from __future__ import unicode_literals
+from six import reraise as raise_
 
 import json
 from django.db.models.query import QuerySet
 from django.db.models import Model
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -55,7 +57,7 @@ class Emitter(object):
         self.version = version
 
         if isinstance(self.data, Exception):
-            raise
+            raise_(self.data, "Re raised exception on __init__")
 
     def method_fields(self, handler, fields):
 
@@ -75,7 +77,7 @@ class Emitter(object):
         """
         Recursively serialize a lot of types, and
         in cases where it doesn't recognize the type,
-        it will fall back to Django's `smart_unicode`.
+        it will fall back to Django's `smart_text`.
 
         Returns `dict`.
         """
@@ -117,7 +119,7 @@ class Emitter(object):
             elif repr(thing).startswith("<django.db.models.fields.related_descriptors.RelatedManager"):
                 ret = _any(thing.all())
             else:
-                ret = smart_unicode(thing, strings_only=True)
+                ret = smart_text(thing, strings_only=True)
 
             return ret
 
