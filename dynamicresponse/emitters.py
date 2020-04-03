@@ -116,7 +116,10 @@ class Emitter(object):
                     ret = _any(f())
                 else:
                     logger.warn('__emittable__ is not a method with the right number of arguments (2). Ignoring...')
-            elif repr(thing).startswith("<django.db.models.fields.related_descriptors.RelatedManager"):
+            elif(
+                repr(thing).startswith("<django.db.models.fields.related_descriptors.RelatedManager") or
+                'RelatedManager' in thing.__class__.__name__
+            ):
                 ret = _any(thing.all())
             else:
                 ret = smart_text(thing, strings_only=True)
@@ -233,7 +236,7 @@ class Emitter(object):
                     if not f.attname.startswith('_'):
                         ret[f.attname] = _any(getattr(data, f.attname))
 
-                fields = dir(data.__class__) + ret.keys()
+                fields = dir(data.__class__) + list(ret.keys())
                 add_ons = [k for k in dir(data) if k not in fields]
 
                 for k in add_ons:
@@ -261,7 +264,7 @@ class Emitter(object):
             Dictionaries.
             """
 
-            return dict([ (k, _any(v, fields)) for k, v in data.iteritems() ])
+            return dict([ (k, _any(v, fields)) for k, v in data.items() ])
 
         # Kickstart the seralizin'.
         return _any(self.data, self.fields)
