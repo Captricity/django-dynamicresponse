@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-
+from six import text_type
 import json
 from django.http import HttpResponse, QueryDict
 from django.utils.deprecation import MiddlewareMixin
@@ -52,7 +52,7 @@ class DynamicFormatMiddleware(MiddlewareMixin):
 
                 # Other values are used directly
                 else:
-                    encoded_dict[item_key] = unicode(value)
+                    encoded_dict[item_key] = text_type(value)
 
         return encoded_dict
 
