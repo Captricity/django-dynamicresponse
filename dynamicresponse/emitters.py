@@ -21,10 +21,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-import logging
-logger = logging.getLogger(__name__)
-
-
 class Emitter(object):
     """
     Super emitter. All other emitters should subclass
@@ -153,7 +149,7 @@ class Emitter(object):
             `exclude` on the handler (see `typemapper`.)
             """
 
-            ret = { }
+            ret = {}
             handler = None
 
             # Does the model implement get_serialization_fields() or serialize_fields() or versioned_serialize_fields()?
@@ -180,8 +176,8 @@ class Emitter(object):
 
                 # Serialize normal fields
                 for f in data._meta.local_fields:
-                    if f.serialize and not any([ p in met_fields for p in [ f.attname, f.name ]]):
-                        if not f.rel:
+                    if f.serialize and not any([p in met_fields for p in [f.attname, f.name]]):
+                        if not f.remote_field:
                             if f.attname in get_fields:
                                 ret[f.attname] = _any(v(f))
                                 get_fields.remove(f.attname)
@@ -280,6 +276,7 @@ class Emitter(object):
         this is a job for the specific emitter below.
         """
         raise NotImplementedError("Please implement render.")
+
 
 class JSONEmitter(Emitter):
     """
