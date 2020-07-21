@@ -65,7 +65,7 @@ class APIMiddleware(MiddlewareMixin):
         already containing HTTP authorization headers.
         """
 
-        if (not request.is_api) or (request.user.is_authenticated()):
+        if (not request.is_api) or request.user.is_authenticated:
             return False
         else:
             return self._get_auth_string(request) is not None
