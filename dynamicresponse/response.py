@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.forms import Form, ModelForm
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
 
 from dynamicresponse.json_response import JsonResponse
@@ -95,7 +95,7 @@ class SerializeOrRender(DynamicResponse):
         if request.is_api:
             res = self.serialize()
         else:
-            res = render_to_response(self.template, self.full_context(), RequestContext(request))
+            res = render(request, self.template, self.full_context(), RequestContext(request))
 
         if hasattr(self, 'extra_headers'):
             for header in self.extra_headers:
