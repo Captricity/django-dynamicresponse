@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 from six import reraise as raise_
 
 import json
+from datetime import datetime
 from django.db.models.query import QuerySet
 from django.db.models import Model
 from django.utils.encoding import smart_text
@@ -14,6 +15,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.paginator import Page
+from django.utils.timezone import make_naive, is_aware
 
 import decimal, inspect
 
@@ -118,6 +120,8 @@ class Emitter(object):
             ):
                 ret = _any(thing.all())
             else:
+                if isinstance(thing, datetime) and is_aware(thing):
+                    thing = make_naive(thing)
                 ret = smart_text(thing, strings_only=True)
 
             return ret
